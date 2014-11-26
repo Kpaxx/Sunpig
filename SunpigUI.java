@@ -5,9 +5,14 @@ Group Members: Jessica Barwell, Chris Kepics**/
 package sunpig;
 
 import java.awt.*;
+
 import javax.swing.*;
 import javax.swing.JTable.*;
+
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class SunpigUI extends JFrame {
 
@@ -40,7 +45,7 @@ public class SunpigUI extends JFrame {
     private JPanel buildSidebar(){
         JPanel sidebar = new JPanel();
         JButton addPList = new JButton("(+) Add Playlist");
-
+                
         //This part here is just to center the button with respect to the list above it.
         JPanel bottomBar = new JPanel();
         bottomBar.setLayout(new BorderLayout());
@@ -54,16 +59,23 @@ public class SunpigUI extends JFrame {
         sidebar.add(buildPlaylists(), BorderLayout.CENTER);
         sidebar.add(bottomBar, BorderLayout.SOUTH);
 
+		// Register the action listeners.
+        addPList.addActionListener(new AddPlayListListenerActionPerformed());
+        
         return sidebar;
     }
 
 
     private JScrollPane buildPlaylists(){
         JList list = new JList();
-        String[] plNames = { "Batman - The Long Halloween", "Chichen Itza", "Chris's 21st Birthday",
-            "Salvador Dali", "Studio Art 101", "Tennessee Vacation 2013"};
+		PlaylistList playlists =  PlaylistList.getInstance();
+//		addPlaylist.getPlaylist();
+        //String[] plNames = { "Batman - The Long Halloween", "Chichen Itza", "Chris's 21st Birthday",
+         //   "Salvador Dali", "Studio Art 101", "Tennessee Vacation 2013"};
+//       ArrayList plNames = addPlaylist.getPlaylist();;
 
-        list.setListData(plNames);
+
+        list.setListData(playlists.getPlaylist().toArray());
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setLayoutOrientation(JList.VERTICAL);
         list.setVisibleRowCount(-1);
@@ -155,6 +167,18 @@ public class SunpigUI extends JFrame {
         
         return imageDisplay;
     }
+    
+    
+    private class AddPlayListListenerActionPerformed implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+
+			String input = JOptionPane.showInputDialog("Enter the new PlayList name.");
+			PlaylistList addPlaylist =  PlaylistList.getInstance();
+			addPlaylist.addPlaylist(input);			
+			buildSidebar();			
+			addPlaylist.quit();			
+		}
+	}
 }
 
 

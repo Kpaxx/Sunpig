@@ -55,7 +55,7 @@ public class PlaylistList {
         pList.remove(index);
     }
     
-    public ArrayList getPlaylist(){
+    public ArrayList<ImagePlaylist> getPlaylist(){
         return pList;
     }
 }

@@ -8,12 +8,13 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class ImagePlaylist extends ImageList{
-    private String name;
+    public String name;
     
     
     //Constructor
     public ImagePlaylist(String n){
         super(loadList(n));
+        name = n;
     }
     
     
@@ -38,5 +39,10 @@ public class ImagePlaylist extends ImageList{
     //Returns list name
     public String getName(){
         return name;
+    }
+    
+    @Override
+    public String toString() {
+    	return getName();
     }
 }

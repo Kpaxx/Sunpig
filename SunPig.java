@@ -8,6 +8,7 @@ public class SunPig {
 
     public static void main(String[] args) {
         new SunpigUI();
+
     }
     
 }

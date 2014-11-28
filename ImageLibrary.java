@@ -41,6 +41,13 @@ public class ImageLibrary extends ImageList{
     }
     
     
+    
+    @Override
+    public String toString() {
+    	return "Images";
+    }
+    
+    
     //Before quitting, the program serializes the ImageLibrary
     public void quit(){
         try{

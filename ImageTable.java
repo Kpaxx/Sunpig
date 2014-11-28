@@ -26,6 +26,12 @@ public class ImageTable extends JTable{
     }
     
     
+    public void setModel(AbstractTableModel m){
+        super.setModel(m);
+        adjustColumnWidth();
+    }
+    
+    
     private void adjustColumnWidth(){
         for (int column = 0; column < getColumnCount(); column++){
             TableColumn tableColumn = columnModel.getColumn(column);

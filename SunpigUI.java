@@ -7,15 +7,17 @@ package sunpig;
 import java.awt.*;
 
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.JTable.*;
 
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 
 public class SunpigUI extends JFrame {
 
+    JList list = new JList();
+    ImageTable iTable = new ImageTable(ImageLibrary.getInstance());
     
     public SunpigUI() {
 
@@ -40,7 +42,6 @@ public class SunpigUI extends JFrame {
         pack();
         setVisible(true);
     }
-
     
     private JPanel buildSidebar(){
         JPanel sidebar = new JPanel();
@@ -54,33 +55,83 @@ public class SunpigUI extends JFrame {
         
         sidebar.setLayout(new BorderLayout());
         sidebar.add(new JPanel(), BorderLayout.WEST); //This is just padding, so the list isn't right against the edge of the frame
-        sidebar.add(new JPanel(), BorderLayout.NORTH); //This one too. There's probably a better way of doing this.
+        sidebar.add(new JPanel(), BorderLayout.NORTH);
         
         sidebar.add(buildPlaylists(), BorderLayout.CENTER);
         sidebar.add(bottomBar, BorderLayout.SOUTH);
 
-		// Register the action listeners.
-        addPList.addActionListener(new AddPlayListListenerActionPerformed());
+	// Register the action listeners.
+        addPList.addActionListener(new ActionListener(){
+		public void actionPerformed(ActionEvent e) {
+                    String input = JOptionPane.showInputDialog("Enter the new PlayList name.");
+                    PlaylistList.getInstance().addPlaylist(input);
+                    list.setListData(PlaylistList.getInstance().getPlaylistList().toArray());
+                    PlaylistList.getInstance().quit();
+		}
+	});
         
         return sidebar;
     }
 
 
     private JScrollPane buildPlaylists(){
-        JList list = new JList();
-		PlaylistList playlists =  PlaylistList.getInstance();
-//		addPlaylist.getPlaylist();
-        //String[] plNames = { "Batman - The Long Halloween", "Chichen Itza", "Chris's 21st Birthday",
-         //   "Salvador Dali", "Studio Art 101", "Tennessee Vacation 2013"};
-//       ArrayList plNames = addPlaylist.getPlaylist();;
-
-
-        list.setListData(playlists.getPlaylist().toArray());
+        JPanel listPanel = new JPanel();
+                
+        //This puts a selector for the Library at the top of the sidebar
+        JList library = new JList();
+        ImageLibrary[] libList = {ImageLibrary.getInstance()};
+        library.setListData(libList);
+        library.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        library.setLayoutOrientation(JList.VERTICAL);
+        library.setVisibleRowCount(-1);
+        
+        //This puts the the playlists into the sidebar
+        list.setListData(PlaylistList.getInstance().getPlaylistList().toArray());
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setLayoutOrientation(JList.VERTICAL);
         list.setVisibleRowCount(-1);
-        JScrollPane listScroller = new JScrollPane(list);
+        list.setDropMode(DropMode.ON);
+        
+        listPanel.setLayout(new BorderLayout());
+        listPanel.add(library, BorderLayout.NORTH);
+        listPanel.add(list, BorderLayout.CENTER);
+        
+        JScrollPane listScroller = new JScrollPane(listPanel);
         listScroller.setAlignmentX(LEFT_ALIGNMENT);
+        
+        
+	// Register the action listeners.
+        library.addListSelectionListener(new ListSelectionListener(){
+		public void valueChanged(ListSelectionEvent e) {
+                    if(e.getValueIsAdjusting()){
+                        list.clearSelection();
+                        iTable.setModel(ImageLibrary.getInstance());
+                    }
+		}
+	});
+        
+        
+        list.addListSelectionListener(new ListSelectionListener(){
+		public void valueChanged(ListSelectionEvent e) {
+                    if(list.getSelectedIndex() >= 0 && e.getValueIsAdjusting()){
+                        library.clearSelection();
+                        iTable.setModel(PlaylistList.getInstance().getPlaylist(list.getSelectedIndex()));
+                    }
+		}
+	});
+        
+        
+        list.addKeyListener(new KeyListener(){
+		public void keyTyped(KeyEvent e) {}
+		public void keyReleased(KeyEvent e) {}
+		public void keyPressed(KeyEvent e) {
+                    if(e.getKeyCode() == KeyEvent.VK_DELETE){
+			PlaylistList.getInstance().removePlaylist(list.getSelectedIndex());
+			list.setListData(PlaylistList.getInstance().getPlaylistList().toArray());
+			PlaylistList.getInstance().quit();
+                    }
+		}
+	});
 
         return listScroller;
     }
@@ -130,7 +181,31 @@ public class SunpigUI extends JFrame {
     
     
     private JScrollPane buildTable(){
-        ImageTable iTable = new ImageTable(ImageLibrary.getInstance());
+        
+	// Register the action listeners.
+        iTable.addKeyListener(new KeyListener(){
+		public void keyTyped(KeyEvent e) {}
+		public void keyReleased(KeyEvent e) {}
+		public void keyPressed(KeyEvent e) {
+                    if(e.getKeyCode() == KeyEvent.VK_DELETE){
+                        ImageList iList;
+                        if(list.getSelectedIndex() >= 0)
+                            iList = PlaylistList.getInstance().getPlaylist(list.getSelectedIndex());
+                        else
+                            iList = ImageLibrary.getInstance();
+                        
+                        
+                        for(int i : iTable.getSelectedRows())
+                            iList.removeImage(i);
+                        
+                        if (list.getSelectedIndex() >= 0)
+                            iTable.setModel(PlaylistList.getInstance().getPlaylist(list.getSelectedIndex()));
+                        else
+                            iTable.setModel(ImageLibrary.getInstance());
+			PlaylistList.getInstance().quit();
+                    }
+		}
+	});
         
         iTable.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         JScrollPane scrollPane = new JScrollPane(iTable);
@@ -167,18 +242,5 @@ public class SunpigUI extends JFrame {
         
         return imageDisplay;
     }
-    
-    
-    private class AddPlayListListenerActionPerformed implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-
-			String input = JOptionPane.showInputDialog("Enter the new PlayList name.");
-			PlaylistList addPlaylist =  PlaylistList.getInstance();
-			addPlaylist.addPlaylist(input);			
-			buildSidebar();			
-			addPlaylist.quit();			
-		}
-	}
 }
-
 

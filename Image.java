@@ -11,26 +11,25 @@ public class Image
 {
    private String path;
    private String title;
-   private String artist;
-   private String location;
+   private String artist = "";
+   private String location = "";
    private Calendar date;
    private SimpleDateFormat fmt = new SimpleDateFormat("dd-MMM-yyyy");
-   private String subject;
+   private String subject = "";
    private Tags tags = new Tags();
-   private int rating;
-   private int pageNum;
+   private int rating = 5;
+   private int pageNum = -1;
    
    /**Constructor*/
    public Image(String path_)
    {
       path = path_;
+      title = path;
       
       date = new GregorianCalendar();
       Date currentDate = new Date();
       date.setTime(currentDate);
       
-      pageNum = -1;
-      rating = 5;
    }
 
    /**The getPath method returns the Image path

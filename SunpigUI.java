@@ -16,8 +16,10 @@ import java.util.ArrayList;
 
 public class SunpigUI extends JFrame {
 
-    JList list = new JList();
-    ImageTable iTable = new ImageTable(ImageLibrary.getInstance());
+    private JList list = new JList();
+    private ImageTable iTable = new ImageTable(ImageLibrary.getInstance());
+    private ImageList displayedList = ImageLibrary.getInstance();
+    private ImageList selectedList = ImageLibrary.getInstance();
     
     public SunpigUI() {
 
@@ -43,6 +45,7 @@ public class SunpigUI extends JFrame {
         setVisible(true);
     }
     
+    
     private JPanel buildSidebar(){
         JPanel sidebar = new JPanel();
         JButton addPList = new JButton("(+) Add Playlist");
@@ -55,7 +58,7 @@ public class SunpigUI extends JFrame {
         
         sidebar.setLayout(new BorderLayout());
         sidebar.add(new JPanel(), BorderLayout.WEST); //This is just padding, so the list isn't right against the edge of the frame
-        sidebar.add(new JPanel(), BorderLayout.NORTH);
+        sidebar.add(new JPanel(), BorderLayout.NORTH); //This one too. There's probably a better way of doing this.
         
         sidebar.add(buildPlaylists(), BorderLayout.CENTER);
         sidebar.add(bottomBar, BorderLayout.SOUTH);
@@ -105,7 +108,8 @@ public class SunpigUI extends JFrame {
 		public void valueChanged(ListSelectionEvent e) {
                     if(e.getValueIsAdjusting()){
                         list.clearSelection();
-                        iTable.setModel(ImageLibrary.getInstance());
+                        selectedList = ImageLibrary.getInstance();
+                        setDisplayedList(selectedList);
                     }
 		}
 	});
@@ -115,7 +119,8 @@ public class SunpigUI extends JFrame {
 		public void valueChanged(ListSelectionEvent e) {
                     if(list.getSelectedIndex() >= 0 && e.getValueIsAdjusting()){
                         library.clearSelection();
-                        iTable.setModel(PlaylistList.getInstance().getPlaylist(list.getSelectedIndex()));
+                        selectedList = PlaylistList.getInstance().getPlaylist(list.getSelectedIndex());
+                        setDisplayedList(selectedList);
                     }
 		}
 	});
@@ -156,9 +161,44 @@ public class SunpigUI extends JFrame {
         
         topBar.setLayout(new BorderLayout());
         topBar.add(buildControlPanel(), BorderLayout.CENTER);
-        topBar.add(new JTextField("Search                   "), BorderLayout.EAST);
+        topBar.add(buildSearchbar(), BorderLayout.EAST);
         
         return topBar;
+    }
+    
+    
+    private JPanel buildSearchbar(){
+        JTextField searchbar = new JTextField();
+        
+        searchbar.setText("Search                          ");
+        searchbar.setEnabled(false);
+        searchbar.addMouseListener(new MouseListener(){
+            public void mouseEntered(MouseEvent e){
+                searchbar.setEnabled(true);
+            }
+            public void mouseExited(MouseEvent e){}
+            public void mousePressed(MouseEvent e){
+                searchbar.setText("");
+            }
+            public void mouseReleased(MouseEvent e){}
+            public void mouseClicked(MouseEvent e){}
+        });
+        
+        searchbar.addKeyListener(new KeyListener(){
+		public void keyTyped(KeyEvent e) {}
+		public void keyPressed(KeyEvent e){}
+		public void keyReleased(KeyEvent e){
+                    String[] searchStrings = searchbar.getText().split("\\s*,\\s*");
+                    ImageList sList = new ImagePlaylist(selectedList);
+                    sList = ImagePlaylist.toPlaylist(sList.search(searchStrings));
+                    setDisplayedList(sList);
+		}
+	});
+        
+        JPanel sBarPanel = new JPanel();
+        sBarPanel.add(searchbar);
+        sBarPanel.setPreferredSize(searchbar.getPreferredSize());
+        return sBarPanel;
     }
     
     
@@ -185,26 +225,16 @@ public class SunpigUI extends JFrame {
 	// Register the action listeners.
         iTable.addKeyListener(new KeyListener(){
 		public void keyTyped(KeyEvent e) {}
-		public void keyReleased(KeyEvent e) {}
-		public void keyPressed(KeyEvent e) {
+		public void keyReleased(KeyEvent e) {
                     if(e.getKeyCode() == KeyEvent.VK_DELETE){
-                        ImageList iList;
-                        if(list.getSelectedIndex() >= 0)
-                            iList = PlaylistList.getInstance().getPlaylist(list.getSelectedIndex());
-                        else
-                            iList = ImageLibrary.getInstance();
-                        
-                        
                         for(int i : iTable.getSelectedRows())
-                            iList.removeImage(i);
+                            displayedList.removeImage(i);
                         
-                        if (list.getSelectedIndex() >= 0)
-                            iTable.setModel(PlaylistList.getInstance().getPlaylist(list.getSelectedIndex()));
-                        else
-                            iTable.setModel(ImageLibrary.getInstance());
+                        updateDisplayedList();
 			PlaylistList.getInstance().quit();
                     }
 		}
+		public void keyPressed(KeyEvent e) {}
 	});
         
         iTable.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
@@ -221,17 +251,6 @@ public class SunpigUI extends JFrame {
         ImageIcon image = new ImageIcon(getClass().getResource("MonaLisa.jpg"));
         JLabel imageContainer = new JLabel(image);
         
-        /*
-        // Might need this later, when figuring out how to resize the image 
-        imageDisplay.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 1.0;
-        c.weighty = 1.0;
-        
-        imageDisplay.add(imageContainer, c);
-        */
         
         // Turns out the easiest way to center something both vertically AND horizontally in
         // a JPanel is to make the panel a 1x1 GridLayout
@@ -241,6 +260,15 @@ public class SunpigUI extends JFrame {
         imageDisplay.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         
         return imageDisplay;
+    }
+    
+    public void setDisplayedList(ImageList i){
+        displayedList = i;
+        iTable.setModel(i);
+    }
+    
+    public void updateDisplayedList(){
+        displayedList.fireTableDataChanged();
     }
 }
 

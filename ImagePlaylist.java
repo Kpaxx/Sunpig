@@ -17,6 +17,18 @@ public class ImagePlaylist extends ImageList{
         name = n;
     }
     
+    //Copy Constructor
+    public ImagePlaylist(ImageList i){
+        super(i);
+        name = "";
+    }
+    
+    //No-Arg Constructor
+    private ImagePlaylist(){
+        super();
+        name = "";
+    }
+    
     
     //Loads a previously saved ImageList, if able
     private static ArrayList loadList(String n){
@@ -44,5 +56,14 @@ public class ImagePlaylist extends ImageList{
     @Override
     public String toString() {
     	return getName();
+    }
+    
+    
+    public static ImagePlaylist toPlaylist(ArrayList<Image> iList){
+        ImagePlaylist list = new ImagePlaylist();
+        for(Image i : iList)
+            list.addImage(i);
+        
+        return list;
     }
 }

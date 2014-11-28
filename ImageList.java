@@ -18,6 +18,11 @@ public abstract class ImageList extends AbstractTableModel implements Serializab
         imageList = i;
     }
     
+    //Copy Constructor
+    protected ImageList(ImageList i){
+        imageList = i.getList();
+    }
+    
     
     //Constructor
     protected ImageList(){
@@ -39,7 +44,7 @@ public abstract class ImageList extends AbstractTableModel implements Serializab
     
     
     //Returns an ArrayList containing only the images that match the strings in s
-    public ArrayList search(ArrayList<String> s){
+    public ArrayList search(String[] s){
         ArrayList<Image> found = new ArrayList<>();
         
         for (Image i : imageList){
@@ -52,32 +57,37 @@ public abstract class ImageList extends AbstractTableModel implements Serializab
     
     
     //Returns true if all of the Strings in s match any of the string or tag fields in Image i
-    private boolean match(Image i, ArrayList<String> s){
+    private boolean match(Image i, String[] s){
         /*
         *  matchCounter keeps track of how many of the Strings in s match one or more fields in Image i
-        *  If, in the end, matchCounter >= s.size(), you know that all of the Strings in s matched fields in i.
+        *  If, in the end, matchCounter >= s.length, you know that all of the Strings in s matched fields in i.
         */
         int matchCounter = 0;
+        ArrayList<String> tags = i.getTags();
         for(String str : s){
-            if(i.getTitle().contains(str))
+            str = str.toLowerCase();
+            if(i.getTitle().toLowerCase().contains(str))
                 matchCounter++;
-            else if(i.getArtist().contains(str))
+            else if(i.getArtist().toLowerCase().contains(str))
                 matchCounter++;
-            else if(i.getLocation().contains(str))
+            else if(i.getLocation().toLowerCase().contains(str))
                 matchCounter++;
-            else if(i.getSubject().contains(str))
+            else if(i.getSubject().toLowerCase().contains(str))
                 matchCounter++;
             else if(i.printPageNum().contains(str))
                 matchCounter++;
+            else{
+                for(String t : tags){
+                    str = str.toLowerCase();
+                    if(t.toLowerCase().contains(str)){
+                        matchCounter++;
+                        break;
+                    }
+                }
+            }
         }
         
-        ArrayList<String> tags = i.getTags();
-        for(String str : s)
-            for(String t : tags)
-                if(t.contains(str))
-                    matchCounter++;
-        
-        if(matchCounter >= s.size())
+        if(matchCounter >= s.length)
             return true;
         
         return false;

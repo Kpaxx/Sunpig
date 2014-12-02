@@ -8,16 +8,14 @@ import java.awt.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.JTable.*;
-
-import java.awt.Image;
+import java.beans.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 
 public class SunpigUI extends JFrame {
 
     private JList list = new JList();
     private ImageTable iTable = new ImageTable(ImageLibrary.getInstance());
+    private DisplayPane dPane = new DisplayPane();
     private ImageList displayedList = ImageLibrary.getInstance();
     private ImageList selectedList = ImageLibrary.getInstance();
     
@@ -143,11 +141,25 @@ public class SunpigUI extends JFrame {
 
     
     private JPanel buildMain(){
-
         JPanel main = new JPanel();
         main.setLayout(new BorderLayout());
+        
+        dPane.setMinimumSize(new Dimension(0,0));
 
-        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, buildTable(), buildImageDisplay());
+        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, buildTable(), dPane);
+        split.addComponentListener(new ComponentListener(){
+            public void componentHidden(ComponentEvent e){}
+            public void componentShown(ComponentEvent e){}
+            public void componentMoved(ComponentEvent e){}
+            public void componentResized(ComponentEvent e){
+                dPane.drawImage(dPane.getHeight(), split.getWidth()-split.getDividerLocation());
+            }
+        });
+        split.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener(){
+            public void propertyChange(PropertyChangeEvent e){
+                dPane.drawImage(dPane.getHeight(), split.getWidth()-split.getDividerLocation());
+            }
+        });
 
         main.add(buildTopBar(), BorderLayout.NORTH);
         main.add(split, BorderLayout.CENTER);
@@ -245,27 +257,11 @@ public class SunpigUI extends JFrame {
     }
     
     
-    private JPanel buildImageDisplay(){
-        JPanel imageDisplay = new JPanel();
-        
-        ImageIcon image = new ImageIcon(getClass().getResource("MonaLisa.jpg"));
-        JLabel imageContainer = new JLabel(image);
-        
-        
-        // Turns out the easiest way to center something both vertically AND horizontally in
-        // a JPanel is to make the panel a 1x1 GridLayout
-        imageDisplay.setLayout(new GridLayout(1,1));
-        imageDisplay.add(imageContainer);
-        
-        imageDisplay.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-        
-        return imageDisplay;
-    }
-    
     public void setDisplayedList(ImageList i){
         displayedList = i;
         iTable.setModel(i);
     }
+    
     
     public void updateDisplayedList(){
         displayedList.fireTableDataChanged();

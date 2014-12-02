@@ -23,7 +23,30 @@ public class SunpigUI extends JFrame {
 
         // Set up default frame attributes
         setTitle("Sunpig");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        JFrame window = new JFrame();
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        WindowListener windowListener = new WindowListener(){
+            @Override
+            public void windowOpened(WindowEvent e){}
+            @Override
+            public void windowIconified(WindowEvent e){}
+            @Override
+            public void windowDeiconified(WindowEvent e){}
+            @Override
+            public void windowDeactivated(WindowEvent e){}
+            @Override
+            public void windowClosing(WindowEvent e){
+                PlaylistList.getInstance().quit();
+                ImageLibrary.getInstance().quit();
+            }
+            @Override
+            public void windowClosed(WindowEvent e){}
+            @Override
+            public void windowActivated(WindowEvent e){}
+        };
+        
+        window.addWindowListener(windowListener);
         
         JPanel sidebar = buildSidebar();
         JPanel main = buildMain();
@@ -180,7 +203,7 @@ public class SunpigUI extends JFrame {
     
     
     private JPanel buildSearchbar(){
-        JTextField searchbar = new JTextField();
+        final JTextField searchbar = new JTextField();
         
         searchbar.setText("Search                          ");
         searchbar.setEnabled(false);

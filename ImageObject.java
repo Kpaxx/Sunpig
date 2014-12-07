@@ -6,8 +6,9 @@ package sunpig;
 
 import java.util.*;
 import java.text.*;
+import java.io.*;
 
-public class Image
+public class ImageObject implements Serializable
 {
    private String path;
    private String title;
@@ -21,7 +22,7 @@ public class Image
    private int pageNum = -1;
    
    /**Constructor*/
-   public Image(String path_)
+   public ImageObject(String path_)
    {
       path = path_;
       title = path;
@@ -32,29 +33,29 @@ public class Image
       
    }
 
-   /**The getPath method returns the Image path
+   /**The getPath method returns the ImageObject path
    @return path The image path*/
    public String getPath()
    {
       return path;
    }
 
-   /**The setTitle method sets the Image title
+   /**The setTitle method sets the ImageObject title
    @param t The image title*/
    public void setTitle(String t)
    {
       title = t;
    }
    
-   /**The getTitle method returns the Image title
-   @return The Image title*/
+   /**The getTitle method returns the ImageObject title
+   @return The ImageObject title*/
    public String getTitle()
    {
       return title;
    }
 
-   /**The setArtist method sets the artist of the Image
-   @param a The artist of the Image*/
+   /**The setArtist method sets the artist of the ImageObject
+   @param a The artist of the ImageObject*/
    public void setArtist(String a)
    {
       artist = a;
@@ -207,6 +208,14 @@ public class Image
          return "";
       else
          return String.valueOf(pageNum);
+   }
+
+   /**The toString method returns the title as a String
+   @return The title as a String*/
+   @Override
+   public String toString()
+   {
+      return title;
    }
 }//end class
    

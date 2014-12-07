@@ -6,6 +6,7 @@ package sunpig;
 
 import java.awt.Component;
 import java.awt.Color;
+import javafx.scene.control.SelectionMode;
 import javax.swing.*;
 import javax.swing.table.*;
 
@@ -13,9 +14,11 @@ public class ImageTable extends JTable{
     private static String[] columnNames = { "Title", "Artist/Photographer", "Tags", "Rating", "Location", "Subject" };
     
     
-    public ImageTable(ImageList i){
+    public ImageTable(ImageTableModel i){
         super(i);
         setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        setTransferHandler(new ImageTransferHandler());
+        setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         setDragEnabled(true);
         
         //Demonstration! Plz remove later
@@ -77,7 +80,7 @@ public class ImageTable extends JTable{
     private void demo(){
         //Note that no matter what order you add the images, they will default to sorting by Artist
         
-        Image MonaLisa = new Image("/MonaLisa.jpg");
+        ImageObject MonaLisa = new ImageObject("/MonaLisa.jpg");
         MonaLisa.setTitle("Mona Lisa");
         MonaLisa.setArtist("Leonardo DaVinci");
         MonaLisa.setTags("oil paint, Louvre");
@@ -86,7 +89,7 @@ public class ImageTable extends JTable{
         MonaLisa.setSubject("");
         ImageLibrary.getInstance().addImage(MonaLisa);
         
-        Image LastSupper = new Image("/LastSupper.png");
+        ImageObject LastSupper = new ImageObject("/LastSupper.png");
         LastSupper.setTitle("The Last Supper");
         LastSupper.setArtist("Leonardo DaVinci");
         LastSupper.setTags("oil paint, Jesus, fresco");
@@ -94,7 +97,7 @@ public class ImageTable extends JTable{
         LastSupper.setLocation("");
         ImageLibrary.getInstance().addImage(LastSupper);
         
-        Image TN1 = new Image("/IMG_106.jpg");
+        ImageObject TN1 = new ImageObject("/IMG_106.jpg");
         TN1.setTitle("IMG_106");
         TN1.setArtist("Chris Kepics");
         TN1.setTags("vacation, waterfall");
@@ -103,7 +106,7 @@ public class ImageTable extends JTable{
         TN1.setSubject("Rachel Kepics");
         ImageLibrary.getInstance().addImage(TN1);
         
-        Image TN2 = new Image("/IMG_105.jpg");
+        ImageObject TN2 = new ImageObject("/IMG_105.jpg");
         TN2.setTitle("IMG_105");
         TN2.setArtist("Chris Kepics");
         TN2.setTags("vacation, mountains");
@@ -112,7 +115,7 @@ public class ImageTable extends JTable{
         TN2.setSubject("");
         ImageLibrary.getInstance().addImage(TN2);
         
-        Image SN = new Image("/StarryNight.jpg");
+        ImageObject SN = new ImageObject("/StarryNight.jpg");
         SN.setTitle("Starry Night");
         SN.setArtist("Vincent VanGogh");
         SN.setTags("oil painting, mountains, wind, impressionism");
@@ -121,7 +124,7 @@ public class ImageTable extends JTable{
         SN.setSubject("");
         ImageLibrary.getInstance().addImage(SN);
         
-        Image VM = new Image("/VitruvianMan.jpg");
+        ImageObject VM = new ImageObject("/VitruvianMan.jpg");
         VM.setTitle("The Vitruvian Man");
         VM.setArtist("Leonardo DaVinci");
         VM.setTags("anatomy");

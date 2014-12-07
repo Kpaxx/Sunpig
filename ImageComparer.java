@@ -6,14 +6,14 @@ package sunpig;
 
 import java.util.Comparator;
 
-public class ImageComparer implements Comparator<Image>, ImageConstants{
+public class ImageComparer implements Comparator<ImageObject>, ImageConstants{
     private int currentSort;
     
     public ImageComparer(int cSort){
         currentSort = cSort;
     }
     
-    public int compare(Image a, Image b){
+    public int compare(ImageObject a, ImageObject b){
         int comp = getData(a, currentSort).compareTo(getData(b, currentSort));
         
         if(comp < 0)
@@ -71,13 +71,13 @@ public class ImageComparer implements Comparator<Image>, ImageConstants{
     }
     
     
-    private int compare(Image a, Image b, int s){
+    private int compare(ImageObject a, ImageObject b, int s){
         return (getData(a, s).compareTo(getData(b, s)));
     }
     
     
     //Returns String data for sorting
-    private String getData(Image i, int d){
+    private String getData(ImageObject i, int d){
         switch (d){
             case SORT_TITLE:
                 return i.getTitle();

@@ -6,8 +6,9 @@ package sunpig;
 
 import java.util.*;
 import java.util.Collections;
+import java.io.*;
 
-public class Tags
+public class Tags implements Serializable
 {
 
    private ArrayList<String> tagList = new ArrayList();

@@ -1,7 +1,7 @@
-/*
- * Chris Kepics
- * CS 111 - Final Project
- */
+/**Chris Kepics
+CIS111B Online - Fall2014
+Group Members: Jessica Barwell, Michele Gravel**/
+
 package sunpig;
 
 import java.io.*;
@@ -22,6 +22,7 @@ public class PlaylistList {
             fIn.close();
         }
         catch(Exception e){
+            System.out.println("ERROR: Playlist not loaded");
             pList = new ArrayList<>();
         }
     }
@@ -33,8 +34,8 @@ public class PlaylistList {
     }
     
     
-    //Before quitting, the program serializes the ImageLibrary
-    public void quit(){
+    //Before quitting, the program serializes the PlaylistList
+    public void save(){
         try{
             FileOutputStream fOut = new FileOutputStream("ImagePlaylists.dat");
             ObjectOutputStream oOut = new ObjectOutputStream(fOut);
@@ -43,7 +44,7 @@ public class PlaylistList {
             fOut.close();
         }
         catch(Exception e){
-            
+            System.out.println("ERROR: Playlists not saved");
         }
     }
     

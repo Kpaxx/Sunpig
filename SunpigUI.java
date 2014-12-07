@@ -7,25 +7,33 @@ package sunpig;
 import java.awt.*;
 
 import javax.swing.*;
+import javax.swing.table.TableRowSorter;
 import javax.swing.event.*;
 import java.beans.*;
 import java.awt.event.*;
+import java.util.*;
 
 public class SunpigUI extends JFrame {
 
     private JList list = new JList();
-    private ImageTable iTable = new ImageTable(ImageLibrary.getInstance());
+    private String[] currentSearch = new String[] {""};
+    private ImageList currentList = ImageLibrary.getInstance();
+    private ImageTableModel tModel = new ImageTableModel(currentList);
+    private ImageTable iTable = new ImageTable(tModel);
     private DisplayPane dPane = new DisplayPane();
-    private ImageList displayedList = ImageLibrary.getInstance();
-    private ImageList selectedList = ImageLibrary.getInstance();
+    private TableRowSorter<ImageTableModel> sorter = new TableRowSorter<>(tModel);
+    private RowFilter searchFilter = new RowFilter(){
+        public boolean include(Entry entry){
+            return match((ImageObject)entry.getValue(0));
+        }
+    };
     
     public SunpigUI() {
 
         // Set up default frame attributes
         setTitle("Sunpig");
         
-        JFrame window = new JFrame();
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         WindowListener windowListener = new WindowListener(){
             @Override
             public void windowOpened(WindowEvent e){}
@@ -37,8 +45,8 @@ public class SunpigUI extends JFrame {
             public void windowDeactivated(WindowEvent e){}
             @Override
             public void windowClosing(WindowEvent e){
-                PlaylistList.getInstance().quit();
-                ImageLibrary.getInstance().quit();
+                PlaylistList.getInstance().save();
+                ImageLibrary.getInstance().save();
             }
             @Override
             public void windowClosed(WindowEvent e){}
@@ -46,7 +54,9 @@ public class SunpigUI extends JFrame {
             public void windowActivated(WindowEvent e){}
         };
         
-        window.addWindowListener(windowListener);
+        addWindowListener(windowListener);
+        
+        sorter.setRowFilter(searchFilter);
         
         JPanel sidebar = buildSidebar();
         JPanel main = buildMain();
@@ -90,7 +100,7 @@ public class SunpigUI extends JFrame {
                     String input = JOptionPane.showInputDialog("Enter the new PlayList name.");
                     PlaylistList.getInstance().addPlaylist(input);
                     list.setListData(PlaylistList.getInstance().getPlaylistList().toArray());
-                    PlaylistList.getInstance().quit();
+                    PlaylistList.getInstance().save();
 		}
 	});
         
@@ -115,6 +125,8 @@ public class SunpigUI extends JFrame {
         list.setLayoutOrientation(JList.VERTICAL);
         list.setVisibleRowCount(-1);
         list.setDropMode(DropMode.ON);
+        //list.setDragEnabled(true);
+        list.setTransferHandler(new PlaylistTransferHandler());
         
         listPanel.setLayout(new BorderLayout());
         listPanel.add(library, BorderLayout.NORTH);
@@ -129,8 +141,7 @@ public class SunpigUI extends JFrame {
 		public void valueChanged(ListSelectionEvent e) {
                     if(e.getValueIsAdjusting()){
                         list.clearSelection();
-                        selectedList = ImageLibrary.getInstance();
-                        setDisplayedList(selectedList);
+                        setCurrentList(ImageLibrary.getInstance());
                     }
 		}
 	});
@@ -140,8 +151,7 @@ public class SunpigUI extends JFrame {
 		public void valueChanged(ListSelectionEvent e) {
                     if(list.getSelectedIndex() >= 0 && e.getValueIsAdjusting()){
                         library.clearSelection();
-                        selectedList = PlaylistList.getInstance().getPlaylist(list.getSelectedIndex());
-                        setDisplayedList(selectedList);
+                        setCurrentList(PlaylistList.getInstance().getPlaylist(list.getSelectedIndex()));
                     }
 		}
 	});
@@ -154,7 +164,7 @@ public class SunpigUI extends JFrame {
                     if(e.getKeyCode() == KeyEvent.VK_DELETE){
 			PlaylistList.getInstance().removePlaylist(list.getSelectedIndex());
 			list.setListData(PlaylistList.getInstance().getPlaylistList().toArray());
-			PlaylistList.getInstance().quit();
+			PlaylistList.getInstance().save();
                     }
 		}
 	});
@@ -223,10 +233,9 @@ public class SunpigUI extends JFrame {
 		public void keyTyped(KeyEvent e) {}
 		public void keyPressed(KeyEvent e){}
 		public void keyReleased(KeyEvent e){
-                    String[] searchStrings = searchbar.getText().split("\\s*,\\s*");
-                    ImageList sList = new ImagePlaylist(selectedList);
-                    sList = ImagePlaylist.toPlaylist(sList.search(searchStrings));
-                    setDisplayedList(sList);
+                    currentSearch = searchbar.getText().trim().split("\\s*,\\s*");
+                    iTable.setRowSorter(sorter);
+                    tModel.fireTableDataChanged();
 		}
 	});
         
@@ -262,11 +271,13 @@ public class SunpigUI extends JFrame {
 		public void keyTyped(KeyEvent e) {}
 		public void keyReleased(KeyEvent e) {
                     if(e.getKeyCode() == KeyEvent.VK_DELETE){
-                        for(int i : iTable.getSelectedRows())
-                            displayedList.removeImage(i);
-                        
-                        updateDisplayedList();
-			PlaylistList.getInstance().quit();
+                        int[] sel = iTable.getSelectedRows();
+
+                        for(int i = sel.length-1; i >= 0; i--)
+                            currentList.removeImage(iTable.convertRowIndexToModel(sel[i]));
+
+                        tModel.fireTableDataChanged();
+                        PlaylistList.getInstance().save();
                     }
 		}
 		public void keyPressed(KeyEvent e) {}
@@ -280,14 +291,58 @@ public class SunpigUI extends JFrame {
     }
     
     
-    public void setDisplayedList(ImageList i){
-        displayedList = i;
-        iTable.setModel(i);
+    public void setCurrentList(ImageList i){
+        currentList = i;
+        tModel.setCurrentList(currentList);
+        sorter.setModel(tModel);
+        tModel.fireTableDataChanged();
     }
     
     
-    public void updateDisplayedList(){
-        displayedList.fireTableDataChanged();
+    public boolean match(ImageObject img){
+        /*
+        *  matchCounter keeps track of how many of the Strings in currentSearch match one or more fields
+        *  in ImageObject entry. If, in the end, matchCounter >= currentSearch.length, you know that all
+        *  of the Strings in currentSearch matched fields in entry.
+        */
+        
+        String cString = "";
+        for(String s : currentSearch)
+            cString += s;
+        
+        if(cString.equals(""))
+            return true;
+        
+        
+        int matchCounter = 0;
+        ArrayList<String> tags = img.getTags();
+        for(String str : currentSearch){
+            str = str.toLowerCase();
+            if(img.getTitle().toLowerCase().contains(str))
+                matchCounter++;
+            else if(img.getArtist().toLowerCase().contains(str))
+                matchCounter++;
+            else if(img.getLocation().toLowerCase().contains(str))
+                matchCounter++;
+            else if(img.getSubject().toLowerCase().contains(str))
+                matchCounter++;
+            else if(img.printPageNum().contains(str))
+                matchCounter++;
+            else{
+                for(String t : tags){
+                    str = str.toLowerCase();
+                    if(t.toLowerCase().contains(str)){
+                        matchCounter++;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        if(matchCounter >= currentSearch.length)
+            return true;
+        
+        return false;
     }
 }
 

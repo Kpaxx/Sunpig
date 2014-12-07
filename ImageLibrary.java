@@ -19,11 +19,11 @@ public class ImageLibrary extends ImageList{
     
     //Loads a previously saved ImageList, if able
     private static ArrayList loadList(){
-        ArrayList<Image> ll;
+        ArrayList<ImageObject> ll;
         try{
             FileInputStream fIn = new FileInputStream("ImageLibrary.dat");
             ObjectInputStream oIn = new ObjectInputStream(fIn);
-            ll = (ArrayList<Image>) oIn.readObject();
+            ll = (ArrayList<ImageObject>) oIn.readObject();
             oIn.close();
             fIn.close();
         }
@@ -49,7 +49,7 @@ public class ImageLibrary extends ImageList{
     
     
     //Before quitting, the program serializes the ImageLibrary
-    public void quit(){
+    public void save(){
         try{
             FileOutputStream fOut = new FileOutputStream("ImageLibrary.dat");
             ObjectOutputStream oOut = new ObjectOutputStream(fOut);

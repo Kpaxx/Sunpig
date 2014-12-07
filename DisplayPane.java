@@ -13,14 +13,14 @@ import org.imgscalr.Scalr;
 
 public class DisplayPane extends JPanel{
     
-    private Image displayedImage;
+    private ImageObject displayedImage;
     
     
     public DisplayPane(){
         // Turns out the easiest way to center something both vertically AND horizontally in
         // a JPanel is to make the panel a 1x1 GridLayout
         setLayout(new GridLayout(1,1));
-        displayedImage = new Image("/Users/Kpax/Desktop/CS 111/SunPig/src/sunpig/MonaLisa.jpg");
+        displayedImage = new ImageObject("/Users/Kpax/Desktop/CS 111/SunPig/src/sunpig/MonaLisa.jpg");
         drawImage(400,400);
         setPreferredSize(new Dimension(400,400));
         setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
@@ -28,7 +28,7 @@ public class DisplayPane extends JPanel{
     }
     
     
-    public void setDisplayedImage(Image i){
+    public void setDisplayedImage(ImageObject i){
         displayedImage = i;
         drawImage(getHeight(), getWidth());
     }

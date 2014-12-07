@@ -32,11 +32,11 @@ public class ImagePlaylist extends ImageList{
     
     //Loads a previously saved ImageList, if able
     private static ArrayList loadList(String n){
-        ArrayList<Image> ll;
+        ArrayList<ImageObject> ll;
         try{
             FileInputStream fIn = new FileInputStream("ImagePlaylist-" + n + ".dat");
             ObjectInputStream oIn = new ObjectInputStream(fIn);
-            ll = (ArrayList<Image>) oIn.readObject();
+            ll = (ArrayList<ImageObject>) oIn.readObject();
             oIn.close();
             fIn.close();
         }
@@ -59,9 +59,9 @@ public class ImagePlaylist extends ImageList{
     }
     
     
-    public static ImagePlaylist toPlaylist(ArrayList<Image> iList){
+    public static ImagePlaylist toPlaylist(ArrayList<ImageObject> iList){
         ImagePlaylist list = new ImagePlaylist();
-        for(Image i : iList)
+        for(ImageObject i : iList)
             list.addImage(i);
         
         return list;

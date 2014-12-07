@@ -8,8 +8,8 @@ import java.io.*;
 import java.util.*;
 import javax.swing.table.*;
 
-public abstract class ImageList extends AbstractTableModel implements Serializable, ImageConstants{
-    protected ArrayList<Image> imageList;
+public abstract class ImageList implements Serializable, ImageConstants{
+    protected ArrayList<ImageObject> imageList;
     protected int currentSort = SORT_ARTIST;
     
     
@@ -43,59 +43,8 @@ public abstract class ImageList extends AbstractTableModel implements Serializab
     }
     
     
-    //Returns an ArrayList containing only the images that match the strings in s
-    public ArrayList search(String[] s){
-        ArrayList<Image> found = new ArrayList<>();
-        
-        for (Image i : imageList){
-            if(match(i, s))
-                found.add(i);
-        }
-        
-        return found;
-    }
-    
-    
-    //Returns true if all of the Strings in s match any of the string or tag fields in Image i
-    private boolean match(Image i, String[] s){
-        /*
-        *  matchCounter keeps track of how many of the Strings in s match one or more fields in Image i
-        *  If, in the end, matchCounter >= s.length, you know that all of the Strings in s matched fields in i.
-        */
-        int matchCounter = 0;
-        ArrayList<String> tags = i.getTags();
-        for(String str : s){
-            str = str.toLowerCase();
-            if(i.getTitle().toLowerCase().contains(str))
-                matchCounter++;
-            else if(i.getArtist().toLowerCase().contains(str))
-                matchCounter++;
-            else if(i.getLocation().toLowerCase().contains(str))
-                matchCounter++;
-            else if(i.getSubject().toLowerCase().contains(str))
-                matchCounter++;
-            else if(i.printPageNum().contains(str))
-                matchCounter++;
-            else{
-                for(String t : tags){
-                    str = str.toLowerCase();
-                    if(t.toLowerCase().contains(str)){
-                        matchCounter++;
-                        break;
-                    }
-                }
-            }
-        }
-        
-        if(matchCounter >= s.length)
-            return true;
-        
-        return false;
-    }
-    
-    
     //Adds an image to the imageList
-    public void addImage(Image i){
+    public void addImage(ImageObject i){
         imageList.add(i);
         Collections.sort(imageList, new ImageComparer(currentSort));
     }
@@ -107,81 +56,4 @@ public abstract class ImageList extends AbstractTableModel implements Serializab
     }
     
     
-    //PAST THIS POINT - ABSTRACTTABLEMODEL METHODS
-    
-    public String getColumnName(int column){
-        switch (column){
-            case 0:
-                return "Title";
-            case 1:
-                return "Artist/Photographer";
-            case 2:
-                return "Tags";
-            case 3:
-                return "Rating";
-            case 4:
-                return "Location";
-            case 5:
-                return "Subject";
-            default:
-                return "";
-        }
-    }
-    
-    
-    public String getValueAt(int row, int col){
-        if(row >= imageList.size())
-            return "";
-        
-        switch (col){
-            case 0:
-                return imageList.get(row).getTitle();
-            case 1:
-                return imageList.get(row).getArtist();
-            case 2:
-                return imageList.get(row).printTags();
-            case 3:
-                return imageList.get(row).printRating();
-            case 4:
-                return imageList.get(row).getLocation();
-            case 5:
-                return imageList.get(row).getSubject();
-            default:
-                return "";
-        }
-    }
-    
-    
-    public void setValueAt(Object aValue,  int rowIndex, int columnIndex){
-        switch (columnIndex){
-            case 0:
-                imageList.get(rowIndex).setTitle((String)aValue);
-                break;
-            case 1:
-                imageList.get(rowIndex).setArtist((String)aValue);
-                break;
-            case 2:
-                imageList.get(rowIndex).setTags((String)aValue);
-                break;
-            case 3:
-                imageList.get(rowIndex).setRating((String)aValue);
-                break;
-            case 4:
-                imageList.get(rowIndex).setLocation((String)aValue);
-                break;
-            case 5:
-                imageList.get(rowIndex).setSubject((String)aValue);
-                break;
-        }
-    }
-    
-    
-    public int getColumnCount(){
-        return 6;
-    }
-    
-    
-    public int getRowCount(){
-        return imageList.size();
-    }
 }

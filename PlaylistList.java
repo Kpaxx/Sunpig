@@ -22,7 +22,7 @@ public class PlaylistList {
             fIn.close();
         }
         catch(Exception e){
-            System.out.println("ERROR: Playlist not loaded");
+            System.err.println("ERROR: Playlist not loaded");
             pList = new ArrayList<>();
         }
     }
@@ -44,7 +44,7 @@ public class PlaylistList {
             fOut.close();
         }
         catch(Exception e){
-            System.out.println("ERROR: Playlists not saved");
+            System.err.println("ERROR: Playlists not saved");
         }
     }
     

@@ -21,10 +21,6 @@ public class ImageTable extends JTable{
         setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         setDragEnabled(true);
         
-        //Demonstration! Plz remove later
-        demo();
-        
-        
         adjustColumnWidth();
     }
     
@@ -75,66 +71,5 @@ public class ImageTable extends JTable{
             comp.setBackground(bg);
         }
         return comp;
-    }
-    
-    private void demo(){
-        //Note that no matter what order you add the images, they will default to sorting by Artist
-        
-        ImageObject MonaLisa = new ImageObject("/MonaLisa.jpg");
-        MonaLisa.setTitle("Mona Lisa");
-        MonaLisa.setArtist("Leonardo DaVinci");
-        MonaLisa.setTags("oil paint, Louvre");
-        MonaLisa.setRating("****");
-        MonaLisa.setLocation("");
-        MonaLisa.setSubject("");
-        ImageLibrary.getInstance().addImage(MonaLisa);
-        
-        ImageObject LastSupper = new ImageObject("/LastSupper.png");
-        LastSupper.setTitle("The Last Supper");
-        LastSupper.setArtist("Leonardo DaVinci");
-        LastSupper.setTags("oil paint, Jesus, fresco");
-        LastSupper.setRating("2");
-        LastSupper.setLocation("");
-        ImageLibrary.getInstance().addImage(LastSupper);
-        
-        ImageObject TN1 = new ImageObject("/IMG_106.jpg");
-        TN1.setTitle("IMG_106");
-        TN1.setArtist("Chris Kepics");
-        TN1.setTags("vacation, waterfall");
-        TN1.setRating("*");
-        TN1.setLocation("Tennessee");
-        TN1.setSubject("Rachel Kepics");
-        ImageLibrary.getInstance().addImage(TN1);
-        
-        ImageObject TN2 = new ImageObject("/IMG_105.jpg");
-        TN2.setTitle("IMG_105");
-        TN2.setArtist("Chris Kepics");
-        TN2.setTags("vacation, mountains");
-        TN2.setRating("5");
-        TN2.setLocation("Tennessee");
-        TN2.setSubject("");
-        ImageLibrary.getInstance().addImage(TN2);
-        
-        ImageObject SN = new ImageObject("/StarryNight.jpg");
-        SN.setTitle("Starry Night");
-        SN.setArtist("Vincent VanGogh");
-        SN.setTags("oil painting, mountains, wind, impressionism");
-        SN.setRating("0");
-        SN.setLocation("");
-        SN.setSubject("");
-        ImageLibrary.getInstance().addImage(SN);
-        
-        ImageObject VM = new ImageObject("/VitruvianMan.jpg");
-        VM.setTitle("The Vitruvian Man");
-        VM.setArtist("Leonardo DaVinci");
-        VM.setTags("anatomy");
-        VM.setRating("3");
-        VM.setLocation("");
-        VM.setSubject("");
-        ImageLibrary.getInstance().addImage(VM);
-        
-        
-        //Sort by other things here!
-        //ImageLibrary.getInstance().setCurrentSort(ImageConstants.SORT_RATING);
     }
 }

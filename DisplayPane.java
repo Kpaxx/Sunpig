@@ -20,7 +20,7 @@ public class DisplayPane extends JPanel{
         // Turns out the easiest way to center something both vertically AND horizontally in
         // a JPanel is to make the panel a 1x1 GridLayout
         setLayout(new GridLayout(1,1));
-        displayedImage = new ImageObject("/Users/Kpax/Desktop/CS 111/SunPig/src/sunpig/MonaLisa.jpg");
+        displayedImage = null;
         drawImage(400,400);
         setPreferredSize(new Dimension(400,400));
         setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
@@ -36,17 +36,20 @@ public class DisplayPane extends JPanel{
     public void drawImage(int height, int width){
         BufferedImage img;
         
-        try{
-            img = ImageIO.read(new File(displayedImage.getPath()));
+        if(displayedImage == null){
+            img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        }else{
+            try{
+                img = ImageIO.read(new File(displayedImage.getPath()));
+            }
+            catch(Exception e){
+                System.out.println(displayedImage.getPath() + ", " + e.getMessage());
+                img = new BufferedImage(410, 410, BufferedImage.TYPE_INT_RGB);
+                Graphics g = img.getGraphics();
+                g.drawString("I'm sorry, Dave, I can't find:",20,20);
+                g.drawString(displayedImage.getTitle(), 20, 40);
+            }
         }
-        catch(Exception e){
-            System.out.println(displayedImage.getPath() + ", " + e.getMessage());
-            img = new BufferedImage(410, 410, BufferedImage.TYPE_INT_RGB);
-            Graphics g = img.getGraphics();
-            g.drawString("I'm sorry, Dave, I can't find:",20,20);
-            g.drawString(displayedImage.getPath(), 20, 40);
-        }
-        
         
         ImageIcon rImage;
         try{

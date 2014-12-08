@@ -12,6 +12,7 @@ import javax.swing.event.*;
 import java.beans.*;
 import java.awt.event.*;
 import java.util.*;
+import java.io.File;
 
 public class SunpigUI extends JFrame {
 
@@ -22,11 +23,12 @@ public class SunpigUI extends JFrame {
     private ImageTable iTable = new ImageTable(tModel);
     private DisplayPane dPane = new DisplayPane();
     private TableRowSorter<ImageTableModel> sorter = new TableRowSorter<>(tModel);
-    private RowFilter searchFilter = new RowFilter(){
+    private final RowFilter searchFilter = new RowFilter(){
         public boolean include(Entry entry){
             return match((ImageObject)entry.getValue(0));
         }
     };
+    private boolean canAdjustDisplay = true;
     
     public SunpigUI() {
 
@@ -205,10 +207,47 @@ public class SunpigUI extends JFrame {
         JPanel topBar = new JPanel();
         
         topBar.setLayout(new BorderLayout());
+        topBar.add(buildAddButton(), BorderLayout.WEST);
         topBar.add(buildControlPanel(), BorderLayout.CENTER);
         topBar.add(buildSearchbar(), BorderLayout.EAST);
         
         return topBar;
+    }
+
+
+    private JPanel buildAddButton(){
+        JPanel pButtonPanel = new JPanel();
+        JFileChooser fc = new JFileChooser();
+        fc.setMultiSelectionEnabled(true);
+        
+        ImageIcon plusImage = new ImageIcon(getClass().getResource("plus.png"));
+        JButton plus = new JButton(plusImage);
+        pButtonPanel.add(plus);
+        
+        plus.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                int dVal = fc.showOpenDialog(list);
+                if(dVal == JFileChooser.APPROVE_OPTION){
+                    File[] files = fc.getSelectedFiles();
+                    for(File f : files){
+                        String n = f.getName();
+                        if(n.toLowerCase().endsWith(".jpg") ||
+                                n.toLowerCase().endsWith(".jpeg") ||
+                                n.toLowerCase().endsWith(".png") ||
+                                n.toLowerCase().endsWith(".gif") ||
+                                n.toLowerCase().endsWith(".bmp")){
+                            ImageObject img = new ImageObject(f.getAbsolutePath());
+                            img.setTitle(f.getName());
+                            ImageLibrary.getInstance().addImage(img);
+                        }else{
+                            System.err.println("UNSUPPORTED FILE TYPE: File " + f.getName() + " could not be opened.");
+                        }
+                    }
+                }
+            }
+        });
+        
+        return pButtonPanel;
     }
     
     
@@ -249,16 +288,16 @@ public class SunpigUI extends JFrame {
     private JPanel buildControlPanel(){
         JPanel controlPanel = new JPanel();
         
-        ImageIcon pauseImage = new ImageIcon(getClass().getResource("control-pause.png"));
+        ImageIcon prevImage = new ImageIcon(getClass().getResource("control-double-180.png"));
         ImageIcon playImage = new ImageIcon(getClass().getResource("control.png"));
-        ImageIcon stopImage = new ImageIcon(getClass().getResource("control-stop-square.png"));
+        ImageIcon nextImage = new ImageIcon(getClass().getResource("control-double.png"));
 
-        JButton pause = new JButton(pauseImage);
-        controlPanel.add(pause);
+        JButton prev = new JButton(prevImage);
+        controlPanel.add(prev);
         JButton play = new JButton(playImage);
         controlPanel.add(play);
-        JButton stop = new JButton(stopImage);
-        controlPanel.add(stop);
+        JButton next = new JButton(nextImage);
+        controlPanel.add(next);
         
         return controlPanel;
     }
@@ -276,12 +315,23 @@ public class SunpigUI extends JFrame {
                         for(int i = sel.length-1; i >= 0; i--)
                             currentList.removeImage(iTable.convertRowIndexToModel(sel[i]));
 
+                        canAdjustDisplay = false;
                         tModel.fireTableDataChanged();
+                        canAdjustDisplay = true;
+                        dPane.setDisplayedImage(null);
+                        ImageLibrary.getInstance().save();
                         PlaylistList.getInstance().save();
                     }
 		}
 		public void keyPressed(KeyEvent e) {}
 	});
+        
+        iTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+            public void valueChanged(ListSelectionEvent e){
+                if(canAdjustDisplay)
+                    dPane.setDisplayedImage((ImageObject)currentList.getList().get(iTable.convertRowIndexToModel(iTable.getSelectedRow())));
+            }
+        });
         
         iTable.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         JScrollPane scrollPane = new JScrollPane(iTable);

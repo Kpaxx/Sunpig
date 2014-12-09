@@ -4,9 +4,7 @@ Group Members: Jessica Barwell, Michele Gravel**/
 
 package sunpig;
 
-import java.awt.Component;
-import java.awt.Color;
-import javafx.scene.control.SelectionMode;
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
 
@@ -34,25 +32,20 @@ public class ImageTable extends JTable{
     private void adjustColumnWidth(){
         for (int column = 0; column < getColumnCount(); column++){
             TableColumn tableColumn = columnModel.getColumn(column);
-            int preferredWidth = tableColumn.getMinWidth();
-            int maxWidth = tableColumn.getMaxWidth();
+            int stringWidth = 10;
+            
+            String s = getModel().getColumnName(column);
+            if(s.length() > stringWidth)
+                stringWidth = s.length();
 
             for (int row = 0; row < getRowCount(); row++)
             {
-                TableCellRenderer cellRenderer = getCellRenderer(row, column);
-                Component c = prepareRenderer(cellRenderer, row, column);
-                int width = c.getPreferredSize().width + getIntercellSpacing().width;
-                preferredWidth = Math.max(preferredWidth+20, width);
-
-                //  We've exceeded the maximum width, no need to check other rows
-                if (preferredWidth >= maxWidth)
-                {
-                    preferredWidth = maxWidth;
-                    break;
-                }
+                s = getModel().getValueAt(row, column).toString();
+                if(s.length() > stringWidth)
+                    stringWidth = s.length()+1;
             }
 
-            tableColumn.setPreferredWidth( preferredWidth );
+            tableColumn.setPreferredWidth(stringWidth*7);
         }
     }
     

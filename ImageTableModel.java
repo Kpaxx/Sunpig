@@ -8,6 +8,8 @@ import javax.swing.table.AbstractTableModel;
 
 public class ImageTableModel extends AbstractTableModel {
     
+    private String[] columnTitles = new String[] {"Title","Artist/Photographer","Tags","Rating","Location","Subject","Date Added","Page"};
+    
     private ImageList currentList;
     
     public ImageTableModel(ImageList il){
@@ -23,22 +25,7 @@ public class ImageTableModel extends AbstractTableModel {
     }
     
     public String getColumnName(int column){
-        switch (column){
-            case 0:
-                return "Title";
-            case 1:
-                return "Artist/Photographer";
-            case 2:
-                return "Tags";
-            case 3:
-                return "Rating";
-            case 4:
-                return "Location";
-            case 5:
-                return "Subject";
-            default:
-                return "";
-        }
+        return columnTitles[column];
     }
     
     
@@ -61,9 +48,21 @@ public class ImageTableModel extends AbstractTableModel {
                 return img.getLocation();
             case 5:
                 return img.getSubject();
+            case 6:
+                return img.getDate();
+            case 7:
+                return img.printPageNum();
             default:
                 return "";
         }
+    }
+
+    
+    public boolean isCellEditable(int row, int col) {
+        if(col==6)
+            return false;
+        
+        return true;
     }
     
     
@@ -90,12 +89,18 @@ public class ImageTableModel extends AbstractTableModel {
             case 5:
                 img.setSubject((String)aValue);
                 break;
+            case 7:
+                img.setPageNum((String)aValue);
+                break;
         }
+        
+        ImageLibrary.getInstance().save();
+        PlaylistList.getInstance().save();
     }
     
     
     public int getColumnCount(){
-        return 6;
+        return columnTitles.length;
     }
     
     

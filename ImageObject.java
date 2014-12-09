@@ -14,8 +14,8 @@ public class ImageObject implements Serializable
    private String title;
    private String artist = "";
    private String location = "";
-   private Calendar date;
-   private SimpleDateFormat fmt = new SimpleDateFormat("dd-MMM-yyyy");
+   private GregorianCalendar date;
+   private SimpleDateFormat fmt = new SimpleDateFormat("MMM.dd.yyyy, h:mm a");
    private String subject = "";
    private Tags tags = new Tags();
    private int rating = 5;

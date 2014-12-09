@@ -5,7 +5,6 @@ Group Members: Jessica Barwell, Chris Kepics**/
 package sunpig;
 
 import java.awt.*;
-
 import javax.swing.*;
 import javax.swing.table.TableRowSorter;
 import javax.swing.event.*;
@@ -195,6 +194,8 @@ public class SunpigUI extends JFrame {
                 dPane.drawImage(dPane.getHeight(), split.getWidth()-split.getDividerLocation());
             }
         });
+        split.setResizeWeight(1);
+        split.setSize(1000, 500);
 
         main.add(buildTopBar(), BorderLayout.NORTH);
         main.add(split, BorderLayout.CENTER);
@@ -272,9 +273,12 @@ public class SunpigUI extends JFrame {
 		public void keyTyped(KeyEvent e) {}
 		public void keyPressed(KeyEvent e){}
 		public void keyReleased(KeyEvent e){
-                    currentSearch = searchbar.getText().trim().split("\\s*,\\s*");
-                    iTable.setRowSorter(sorter);
-                    tModel.fireTableDataChanged();
+                    if(!iTable.isEditing()){
+                        iTable.getSelectionModel().clearSelection();
+                        currentSearch = searchbar.getText().trim().split("\\s*,\\s*");
+                        iTable.setRowSorter(sorter);
+                        tModel.fireTableDataChanged();
+                    }
 		}
 	});
         

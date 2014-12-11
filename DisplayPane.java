@@ -17,7 +17,7 @@ public class DisplayPane extends JPanel{
     
     
     public DisplayPane(){
-        // Turns out the easiest way to center something both vertically AND horizontally in
+        // It turns out the easiest way to center something both vertically AND horizontally inside
         // a JPanel is to make the panel a 1x1 GridLayout
         setLayout(new GridLayout(1,1));
         displayedImage = null;
@@ -25,6 +25,7 @@ public class DisplayPane extends JPanel{
         setPreferredSize(new Dimension(400,400));
         setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         setBackground(Color.BLACK);
+        setMinimumSize(new Dimension(0,0));
     }
     
     
@@ -33,6 +34,9 @@ public class DisplayPane extends JPanel{
         drawImage(getHeight(), getWidth());
     }
     
+    
+    //If no image is selected, draw a blank pane. If the file can't be found, draw an error message
+    //in the pane. If the image can be found, draw the image, resized to fit in the pane.
     public void drawImage(int height, int width){
         BufferedImage img;
         

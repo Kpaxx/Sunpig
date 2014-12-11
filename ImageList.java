@@ -6,11 +6,9 @@ package sunpig;
 
 import java.io.*;
 import java.util.*;
-import javax.swing.table.*;
 
-public abstract class ImageList implements Serializable, ImageConstants{
+public abstract class ImageList implements Serializable{
     protected ArrayList<ImageObject> imageList;
-    protected int currentSort = SORT_ARTIST;
     
     
     //Constructor
@@ -30,13 +28,6 @@ public abstract class ImageList implements Serializable, ImageConstants{
     }
     
     
-    //Sets currentSort, which keeps track of how the ImageList is currently sorted
-    public void setCurrentSort(int s){
-        currentSort = s;
-        Collections.sort(imageList, new ImageComparer(currentSort));
-    }
-    
-    
     //Returns the full ImageList
     public ArrayList getList(){
         return imageList;
@@ -46,7 +37,6 @@ public abstract class ImageList implements Serializable, ImageConstants{
     //Adds an image to the imageList
     public void addImage(ImageObject i){
         imageList.add(i);
-        Collections.sort(imageList, new ImageComparer(currentSort));
     }
     
     

@@ -44,7 +44,7 @@ public class ImageLibrary extends ImageList{
     
     @Override
     public String toString() {
-    	return "Images";
+    	return "Image Library";
     }
     
     

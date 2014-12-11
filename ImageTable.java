@@ -9,7 +9,6 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 public class ImageTable extends JTable{
-    private static String[] columnNames = { "Title", "Artist/Photographer", "Tags", "Rating", "Location", "Subject" };
     
     
     public ImageTable(ImageTableModel i){
@@ -29,6 +28,8 @@ public class ImageTable extends JTable{
     }
     
     
+    //This basically figures out the cell in each column that has the most characters
+    //And resizes that column to more or less fit the text in that cell
     private void adjustColumnWidth(){
         for (int column = 0; column < getColumnCount(); column++){
             TableColumn tableColumn = columnModel.getColumn(column);
@@ -50,6 +51,7 @@ public class ImageTable extends JTable{
     }
     
     
+    //Alternates the color of each row of the table for easier reading
     public Component prepareRenderer(TableCellRenderer renderer, int row, int column){
         Component comp = super.prepareRenderer(renderer, row, column);
         Color gray = new Color(240,240,240);

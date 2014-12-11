@@ -29,6 +29,8 @@ public class ImageTableModel extends AbstractTableModel {
     }
     
     
+    //The first column in the table actually contains the ImageObjects themselves, to allow easier access to
+    //the objects directly through the table. The ImageObject's toString method returns the title of the image.
     public Object getValueAt(int row, int col){
         if(row >= currentList.getList().size())
             return "";
@@ -57,7 +59,7 @@ public class ImageTableModel extends AbstractTableModel {
         }
     }
 
-    
+    //Date is not editable. Everything else is.
     public boolean isCellEditable(int row, int col) {
         if(col==6)
             return false;
